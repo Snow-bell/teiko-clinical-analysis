@@ -56,3 +56,38 @@ Then open the link provided in the terminal.
 
 ### Reproducing outputs
 Running `make pipeline` is all that is needed to reproduce all outputs. The pipeline runs sequentially from start to finish without any manual intervention.
+
+## Code Structure
+
+### Overview
+```
+teiko-clinical-analysis/
+├── load_data.py     # Initializes SQLite database and loads cell-count.csv
+├── analysis.py      # Runs all analysis (Parts 2-4)
+├── dashboard.py     # Streamlit dashboard
+├── cell-count.csv   # Input data
+├── requirements.txt # Python dependencies
+├── Makefile         # Setup, pipeline, and dashboard targets
+├── docs/
+│ └── er-diagram.svg # Entity relationship diagram
+└── output/
+├── frequency_table.csv # Part 2 output
+├── stat_analysis.csv   # Part 3 output
+├── boxplot.png         # Part 3 boxplot
+├── subset_samples_per_project.csv # Part 4 output
+├── subset_response_counts.csv     # Part 4 output
+└── subset_sex_counts.csv          # Part 4 output
+```
+
+
+### Design decisions
+
+The pipeline is split into two scripts: `load_data.py` handles database initialization and data loading, while `analysis.py` handles all analytical tasks. This separation keeps data ingestion and analysis concerns independent, so if the data changes, only `load_data.py` needs to be updated.
+
+All three analysis parts live in `analysis.py` as separate functions to keep the code organized without cluttering the repo with multiple files. 
+
+The dashboard in `dashboard.py` reads directly from the output CSVs and PNG rather than rerunning the analysis, keeping it lightweight and fast.
+
+## Dashboard
+
+[View the dashboard](https://teiko-clinical-analysis-6cgjwnj57nq2bmbwczt9kr.streamlit.app/#teiko-assessment-clinical-trial-cell-population-analysis)
