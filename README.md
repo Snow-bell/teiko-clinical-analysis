@@ -1,6 +1,6 @@
 ## Database Schema
 
-<img src="docs/er-diagram.svg" width="500" height="400"/>
+<img src="docs/er-diagram.svg" width="500" height="700"/>
 
 The schema is organized into four tables: `project`, `subject`, `sample`, and `cell_count`. This relational database is designed to be in Third Normal Form (3NF).
 
