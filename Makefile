@@ -3,6 +3,7 @@ setup:
 
 pipeline:
 	python load_data.py
+	python analysis.py
 
 dashboard:
 	streamlit run dashboard.py
