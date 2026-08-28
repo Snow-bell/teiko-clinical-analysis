@@ -71,7 +71,53 @@ def run_statistical_analysis(df):   # Part 3: Statistical Analysis
     return results_df
 
 def run_subset_analysis(conn):      # Part 4: Data Subset Analysis
-    ...
+    query = """
+        SELECT
+            p.name AS project,
+            sub.subject_name,
+            sub.response,
+            sub.sex,
+            s.sample_name,
+            s.sample_type,
+            s.time_from_treatment_start
+        FROM sample s
+        JOIN subject sub ON s.subject_id = sub.subject_id
+        JOIN project p ON sub.project_id = p.project_id
+        WHERE sub.condition = 'melanoma'
+        AND s.sample_type = 'PBMC'
+        AND s.time_from_treatment_start = 0
+        AND sub.treatment = 'miraclib'
+    """
+    df = pd.read_sql_query(query, conn)
+
+    samples_per_project = df.groupby("project")["sample_name"].count().reset_index()
+    samples_per_project.columns = ["project", "sample_count"]
+
+    response_counts = df.drop_duplicates("subject_name").groupby("response")["subject_name"].count().reset_index()
+    response_counts.columns = ["response", "subject_count"]
+
+    sex_counts = df.drop_duplicates("subject_name").groupby("sex")["subject_name"].count().reset_index()
+    sex_counts.columns = ["sex", "subject_count"]
+
+    samples_per_project.to_csv("output/subset_samples_per_project.csv", index=False)
+    response_counts.to_csv("output/subset_response_counts.csv", index=False)
+    sex_counts.to_csv("output/subset_sex_counts.csv", index=False)
+    
+    avg_b_cells_query = """
+        SELECT ROUND(AVG(cc.count), 2) AS avg_b_cells
+        FROM cell_count cc
+        JOIN sample s ON cc.sample_id = s.sample_id
+        JOIN subject sub ON s.subject_id = sub.subject_id
+        WHERE sub.condition = 'melanoma'
+        AND sub.sex = 'M'
+        AND sub.response = 'yes'
+        AND s.time_from_treatment_start = 0
+        AND cc.population = 'b_cell'
+    """
+    avg_b_cells = conn.execute(avg_b_cells_query).fetchone()[0]
+    print(f"Average B cells (melanoma male responders at time=0): {avg_b_cells:.2f}")
+
+    return samples_per_project, response_counts, sex_counts
 
 def main():
     conn = get_connection()
