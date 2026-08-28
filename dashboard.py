@@ -13,7 +13,7 @@ with tab1:
 
 with tab2:
     st.header("Statistical Analysis: Responders vs Non-Responders")
-    st.image("output/boxplot.png", width=800)
+    st.image("output/boxplot.png", width=900)
     st.subheader("Mann-Whitney U Test Results")
     stat_df = pd.read_csv("output/stat_analysis.csv")
     st.dataframe(stat_df)
