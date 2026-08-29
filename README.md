@@ -10,7 +10,7 @@ The schema follows a natural hierarchy derived from the clinical trial data: a `
 
 Separating `subject` from `sample` is a key design decision. A subject can appear multiple times across timepoints, so collapsing them into one table would duplicate subject-level attributes like `condition`, `treatment`, and `response` across every sample row, violating 3NF.
 
-Cell counts are stored in a normalized `cell_count` table with one row per population per sample, rather than as columns on the sample table. This means adding new cell populations requires no schema changes, just new rows — which is important as cytometry panels evolve across projects.
+Cell counts are stored in a normalized `cell_count` table with one row per population per sample, rather than as columns on the sample table. This means adding new cell populations requires no schema changes, just new rows; which is important as cytometry panels evolve across projects.
 
 ### Scalability
 
@@ -21,13 +21,22 @@ At scale, with hundreds of projects, thousands of samples, and varied analytics,
 - **New metadata**: additional subject or sample attributes can be added as columns without restructuring the core schema
 - **Analytics**: aggregations like frequency calculations naturally group by `sample_id` across the `cell_count` table, and filtering by `condition`, `treatment`, or `response` joins cleanly through the hierarchy
 
-If the dataset scaled to millions of rows, this schema could migrate to PostgreSQL with minimal changes. The same structure supports partitioning by project and parallel query execution.
+At current scale, indexes are not added to the schema but would be a natural next step as data grows. Additionally, SQLite is single-writer, so multiple analysts querying simultaneously would create concurrency conflicts. One way to resolve this is by migrating the schema to PostgreSQL. This migration would also allow the dataset to scale to millions of rows with minimal changes. 
 
 ## Instructions
 
 ### Requirements
+
 - Python 3.8+
 - Git
+- pandas
+- scipy
+- matplotlib
+- seaborn
+- streamlit
+- Pillow
+
+All Python dependencies are listed in `requirements.txt` and installed via `make setup`.
 
 ### Setup
 Clone the repository and run:
